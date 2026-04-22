@@ -1,0 +1,13 @@
+# Compilados do Java
+*.class
+
+# Pastas de saída (binários)
+bin/
+out/
+
+# Configurações do VS Code e extensões Java
+.vscode/
+.project
+.classpath
+.settings/
+.factorypath
