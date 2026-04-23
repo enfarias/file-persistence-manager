@@ -1,19 +1,22 @@
 package com.myproject;
 
+import java.util.List;
+import java.util.function.Consumer;
+
 public class Main {
-
     public static void main(String[] args) {
-        MusicPlayer musicPlayer = new Computer();
-        runMusic(musicPlayer);
-        runVideo(((VideoPlayer) musicPlayer));
-    }
 
-    public static void runVideo(VideoPlayer videoPlayer) {
-        videoPlayer.playVideo();
-    }
+        List<User> users = List.of(
+                new User("Alice", 21),
+                new User("Bob", 32),
+                new User("Charlie", 44));
 
-    public static void runMusic(MusicPlayer musicPlayer) {
-        musicPlayer.playMusic();
+        /*
+         * users.forEach((User user) -> {
+         * System.out.println(user);
+         * 
+         * });
+         */
+        users.forEach(System.out::println);
     }
-
 }
