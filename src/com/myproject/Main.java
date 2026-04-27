@@ -1,52 +1,74 @@
 package com.myproject;
 
-import java.time.Duration;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Scanner;
-import java.util.Vector;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Predicate;
 
 public class Main {
-
-    private final static Scanner scanner = new Scanner(System.in);
-
     public static void main(String[] args) {
-        List<User> users = new ArrayList<>();
-        var user = new User(1, "John Doe", "john.doe@example.com");
-        users.add(user);
-        users.add(new User(2, "Jane Doe", "jane.doe@example.com"));
-        users.add(new User(3, "Bob Smith", "bob.smith@example.com"));
+        // HashSet não garante nenhuma ordem, enquanto LinkedHashSet usado mais abaixo,
+        // mantém a ordem de inserção
+        Set<User> users = new HashSet<>();
+        users.add(new User(1, "Edson"));
+        users.add(new User(2, "Maria"));
+        users.add(new User(3, "João"));
+        users.add(new User(4, "Ana"));
 
-        System.out.println(users);
-        System.out.println(users.contains(user));
-        System.out.println(users.contains(new User(3, "Bob Smith", "bob.smith@example.com")));
-        System.out.println(users.remove(1));
-        System.out.println(new User(1, "John Doe", "john.doe@example.com"));
-        System.out.println(new User(1, "John Doe", "john.doe@example.com")
-                .equals(new User(1, "John Doe", "john.doe@example.com")));
+        // Testa se dois objetos diferentes na memória são "logicamente" iguais, usando
+        // Equals e HashCode
+        System.out.println(new User(1, "Edson").equals(new User(1, "Edson")));
+        System.out.println(new User(1, "Edson").equals(new User(2, "Maria")));
 
-        var arrayStart = OffsetDateTime.now();
-        List<Integer> arrayList = new ArrayList<>();
-        for (int i = 0; i < 100_000_000; i++) {
-            arrayList.add(i);
-        }
-        System.out.println(Duration.between(arrayStart, OffsetDateTime.now()).toMillis());
+        System.out.println(new User(1, "Edson").hashCode());
 
-        var vectorStart = OffsetDateTime.now();
-        List<Integer> vector = new Vector<>();
-        for (int i = 0; i < 100_000_000; i++) {
-            vector.add(i);
-        }
-        System.out.println(Duration.between(vectorStart, OffsetDateTime.now()).toMillis());
+        // Retorna true porque o HashSet usa o hashCode para encontrar o "balde"
+        // (bucket)
+        // onde o objeto estaria e o equals para confirmar a identidade
+        System.out.println(users.contains(new User(1, "Edson")));
 
-        var linkedStart = OffsetDateTime.now();
-        List<Integer> linkedList = new LinkedList<>();
-        for (int i = 0; i < 100_000_000; i++) {
-            linkedList.add(i);
-        }
-        System.out.println(Duration.between(linkedStart, OffsetDateTime.now()).toMillis());
+        // Retorna false porque, embora o ID 2 exista, o nome associado a ele no Set
+        // original é "Maria" e não "João"
+        System.out.println(users.contains(new User(2, "João")));
+
+        System.out.println("=========================================");
+
+        // LinkedHashSet: Mantém a ordem de inserção.
+        Set<User> users2 = new LinkedHashSet<>();
+        users2.add(new User(1, "Edson"));
+        users2.add(new User(2, "Maria"));
+        users2.add(new User(3, "João"));
+        users2.add(new User(4, "Ana"));
+        users2.add(new User(5, "Anderson"));
+
+        // Os usuários aparecem exatamente na ordem do .add()
+        System.out.println(users2);
+
+        // Remove os objetos que coincidem com os fornecidos na lista
+        System.out.println(users2.removeAll(List.of(new User(3, "João"), new User(4, "Ana"))));
+        System.out.println(users2);
+
+        // Usa uma negação. Remove quem não tem ID maior que 1, ou seja, o Edson (ID 1)
+        // é removido
+        users2.removeIf(Predicate.not(user2 -> user2.getId() > 1));
+        System.out.println(users2);
+
+        System.out.println("=========================================");
+
+        // O TreeSet não usa equals/hashCode para determinar duplicatas, mas sim o
+        // Comparator.
+        Set<User> users3 = new TreeSet<>(Comparator.comparingInt(User::getId).reversed()); // ordena pelo ID de forma
+                                                                                           // decrescente (4, 3, 2, 1).
+        users3.add(new User(1, "Edson"));
+        users3.add(new User(2, "Maria"));
+        users3.add(new User(3, "João"));
+        users3.add(new User(4, "Ana"));
+
+        System.out.println(users3);
+
     }
 
 }

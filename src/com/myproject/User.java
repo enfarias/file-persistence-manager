@@ -1,29 +1,30 @@
 package com.myproject;
 
 import java.util.Objects;
+import static java.util.Objects.isNull;
+import static java.util.Objects.hash;
 
 public class User {
 
-    private int code;
-    private String name;
-    private String email;
+    private int id;
 
-    public User(int code, String name, String email) {
-        this.code = code;
-        this.name = name;
-        this.email = email;
-    }
+    private String name;
 
     public User() {
 
     }
 
-    public int getCode() {
-        return code;
+    public User(int id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
-    public void setCode(int code) {
-        this.code = code;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -34,30 +35,24 @@ public class User {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public String toString() {
+        return String.format("{'id' : %s, 'name': %s}", id, name);
     }
 
     @Override
     public boolean equals(Object obj) {
-        var isEqual = false;
-        if (obj instanceof User user) {
-            if (this == user)
-                isEqual = true;
-            if (this.code == user.code && Objects.equals(this.name, user.name)
-                    && Objects.equals(this.email, user.email))
-                isEqual = true;
+        if (obj == this) {
+            return true;
         }
-        return isEqual;
+        if ((isNull(obj)) || (!(obj instanceof User user))) {
+            return false;
+        }
+        return this.id == user.getId() && Objects.equals(user.getName(), this.name);
     }
 
     @Override
-    public String toString() {
-        return String.format("{'code': %s, 'name': %s, 'email': %s}", this.code, this.name, this.email);
+    public int hashCode() {
+        return hash(this.id, this.name);
     }
 
 }
