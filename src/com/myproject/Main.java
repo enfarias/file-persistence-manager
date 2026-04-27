@@ -1,73 +1,52 @@
 package com.myproject;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.function.Predicate;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.myproject.domain.User;
 
 public class Main {
     public static void main(String[] args) {
-        // HashSet não garante nenhuma ordem, enquanto LinkedHashSet usado mais abaixo,
-        // mantém a ordem de inserção
-        Set<User> users = new HashSet<>();
-        users.add(new User(1, "Edson"));
-        users.add(new User(2, "Maria"));
-        users.add(new User(3, "João"));
-        users.add(new User(4, "Ana"));
+        Map<String, User> users = new HashMap<>();
 
-        // Testa se dois objetos diferentes na memória são "logicamente" iguais, usando
-        // Equals e HashCode
-        System.out.println(new User(1, "Edson").equals(new User(1, "Edson")));
-        System.out.println(new User(1, "Edson").equals(new User(2, "Maria")));
+        System.out.println(users.isEmpty());
 
-        System.out.println(new User(1, "Edson").hashCode());
+        users.put("joao@joao.com", new User("João", 22));
+        users.put("maria@maria.com", new User("Maria", 32));
+        users.put("pedro@pedro.com", new User("Pedro", 18));
+        users.put("ana@ana.com", new User("Ana", 40));
 
-        // Retorna true porque o HashSet usa o hashCode para encontrar o "balde"
-        // (bucket)
-        // onde o objeto estaria e o equals para confirmar a identidade
-        System.out.println(users.contains(new User(1, "Edson")));
+        System.out.println(users.isEmpty());
+        System.out.println(users);
+        System.out.println("================================");
 
-        // Retorna false porque, embora o ID 2 exista, o nome associado a ele no Set
-        // original é "Maria" e não "João"
-        System.out.println(users.contains(new User(2, "João")));
+        users.keySet().forEach(System.out::println);
+        System.out.println("================================");
 
-        System.out.println("=========================================");
+        users.values().forEach(System.out::println);
+        System.out.println("================================");
 
-        // LinkedHashSet: Mantém a ordem de inserção.
-        Set<User> users2 = new LinkedHashSet<>();
-        users2.add(new User(1, "Edson"));
-        users2.add(new User(2, "Maria"));
-        users2.add(new User(3, "João"));
-        users2.add(new User(4, "Ana"));
-        users2.add(new User(5, "Anderson"));
+        System.out.println(users.containsKey("marcos@marcos.com"));
+        System.out.println(users.containsKey("pedro@pedro.com"));
+        System.out.println("================================");
 
-        // Os usuários aparecem exatamente na ordem do .add()
-        System.out.println(users2);
+        System.out.println(users.remove("maria@maria.com", new User("Maria", 32)));
+        System.out.println("================================");
 
-        // Remove os objetos que coincidem com os fornecidos na lista
-        System.out.println(users2.removeAll(List.of(new User(3, "João"), new User(4, "Ana"))));
-        System.out.println(users2);
+        users.forEach((k, v) -> System.out.printf("key: %s | value %s \n", k, v));
+        users.replace("pedro@pedro.com", new User("Pedro", 60));
+        users.forEach((k, v) -> System.out.printf("key: %s | value %s \n", k, v));
+        System.out.println("================================");
 
-        // Usa uma negação. Remove quem não tem ID maior que 1, ou seja, o Edson (ID 1)
-        // é removido
-        users2.removeIf(Predicate.not(user2 -> user2.getId() > 1));
-        System.out.println(users2);
+        System.out.println(users.get("joao@joao.com"));
+        System.out.println("================================");
 
-        System.out.println("=========================================");
-
-        // O TreeSet não usa equals/hashCode para determinar duplicatas, mas sim o
-        // Comparator.
-        Set<User> users3 = new TreeSet<>(Comparator.comparingInt(User::getId).reversed()); // ordena pelo ID de forma
-                                                                                           // decrescente (4, 3, 2, 1).
-        users3.add(new User(1, "Edson"));
-        users3.add(new User(2, "Maria"));
-        users3.add(new User(3, "João"));
-        users3.add(new User(4, "Ana"));
-
-        System.out.println(users3);
+        users.merge("ana@ana.com", new User("", -1), (user, user2) -> {
+            System.out.println(user);
+            System.out.println(user2);
+            return user2;
+        });
+        System.out.println("================================");
 
     }
 
