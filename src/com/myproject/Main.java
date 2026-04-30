@@ -1,63 +1,93 @@
 package com.myproject;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+
+import com.myproject.com.myproject.domain.Contact;
+import com.myproject.com.myproject.domain.ContactType;
+
+import static com.myproject.com.myproject.domain.ContactType.EMAIL;
+import static com.myproject.com.myproject.domain.ContactType.PHONE;
+import static com.myproject.com.myproject.domain.Sex.FEMALE;
+import static com.myproject.com.myproject.domain.Sex.MALE;
+import com.myproject.com.myproject.domain.User;
 
 public class Main {
     public static void main(String[] args) {
+        List<User> users = new ArrayList<>(generateUsers());
 
-        var value1 = Stream.of("Maria", "João", "Pedro", "Ana", "Lucas", "Luana", "Marcia", "Leandro")
-                .filter(name -> name.endsWith("o"))
-                .limit(2)
-                .toList();
-        System.out.println(value1);
+        // users.sort(Comparator.comparing(User::name));
 
-        System.out.println("\n------------------------------------------\n");
+        // users.forEach(System.out::println);
 
-        var value2 = Stream.of("Maria", "João", "Pedro", "Ana", "Lucas", "Luana", "Marcia")
-                .filter(n -> n.endsWith("o"))
-                .anyMatch(n -> n.contains("J"));
-        System.out.println(value2);
-
-        System.out.println("\n------------------------------------------\n");
-
-        var value3 = Stream.of("Maria", "João", "Pedro", "Ana", "Lucas", "Luana", "Marcia", "Leandro")
-                .reduce("", (a, b) -> a + b + ";");
-        System.out.println(value3);
-
-        System.out.println("\n------------------------------------------\n");
-
-        var value4 = Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 7, 8, 7)
-                .distinct().toList();
-
-        System.out.println(value4);
-
-        System.out.println("\n------------------------------------------\n");
-
-        var value5 = Stream.of(1, 2, 3, 4, 5, 6, 7, 8)
-                .map(n -> n % 2 == 0)
+        var values = users.stream()
+                // .filter(user -> user.contacts().size() >= 2)
+                // .filter(user -> user.contacts() == null && user.contacts().isEmpty())
+                .filter(user -> user.contacts().stream().anyMatch(c -> c.type() == EMAIL))
                 .toList();
 
-        System.out.println(value5);
+        // System.out.println("\n=========== Users with at least 2 contacts: ===========
+        // \n");
+        // System.out.println("\n=============== Users without contacts ================
+        // \n");
+        System.out.println("\n================ Users who have emails ================ \n");
 
-        System.out.println("\n------------------------------------------\n");
+        values.forEach(System.out::println);
 
-        List<Integer> values6 = List.of(3, 6, 9, 12);
-        List<Integer> values7 = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+        var values2 = users.stream()
+                .flatMap(user -> user.contacts().stream())
+                .filter(contact -> contact.type() == PHONE)
+                // .filter(contact -> contact.description().contains("gmail"))
+                .sorted(Comparator.comparing(Contact::description))
+                .map(contact -> String.format("{\n     'description': '%s', \n     'type': '%s'\n}",
+                        contact.description(),
+                        contact.type()))
+                .toList();
 
-        var newValues = values7.stream()
-                .filter(values6::contains)
-                .peek(n -> System.out.printf("Filter %s \n", n))
-                .map(n -> values6.stream().reduce(n, (n1, n2) -> n1 - n2))
-                .peek(n -> System.out.printf("Map %s \n", n))
-                .collect(Collectors.toSet());
+        System.out.println("\n=============== Contacts of type PHONE ================ \n");
 
-        System.out.println(newValues);
+        values2.forEach(System.out::println);
 
-        System.out.println("\n------------------------------------------\n");
+        var values3 = users.stream()
+                .filter(user -> user.sex() == FEMALE)
+                .collect(Collectors.toMap(User::name, user -> user));
+
+        System.out.println("\n==================== Female Users ====================== \n");
+
+        values3.forEach((key, value) -> System.out.printf("Key: %s | Value: %s \n", key, value));
+    }
+
+    private static List<User> generateUsers() {
+
+        var contacts1 = List.of(
+                new Contact("(19)90665-9104", ContactType.PHONE),
+                new Contact("joao@gmail.com", ContactType.EMAIL));
+
+        var contacts2 = List.of(
+                new Contact("(21)92121-0032", ContactType.PHONE));
+
+        var contacts3 = List.of(
+                new Contact("lucas@Outlook.com", ContactType.EMAIL));
+
+        var contacts4 = List.of(
+                new Contact("andreia@outlook.com", ContactType.EMAIL),
+                new Contact("andreia@gmail.com", ContactType.EMAIL));
+
+        var contacts5 = List.of(
+                new Contact("(31)97785-4456", ContactType.PHONE),
+                new Contact("(31)92115-0011", ContactType.PHONE));
+
+        var user1 = new User("João", 26, MALE, new ArrayList<>(contacts1));
+        var user2 = new User("Maria", 28, FEMALE, new ArrayList<>(contacts2));
+        var user3 = new User("Lucas", 19, MALE, new ArrayList<>(contacts3));
+        var user4 = new User("Andreia", 40, FEMALE, new ArrayList<>(contacts4));
+        var user5 = new User("Vitor", 30, MALE, new ArrayList<>(contacts5));
+        var user6 = new User("Bruna", 36, FEMALE, new ArrayList<>());
+
+        return List.of(user1, user2, user3, user4, user5, user6);
+
     }
 
 }
