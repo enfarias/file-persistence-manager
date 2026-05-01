@@ -1,11 +1,10 @@
-package com.myproject.com.myproject;
+package com.myproject.domain;
 
 import java.util.Objects;
 
-import com.myproject.domain.GenericDomain;
+public class UserDomain implements GenericDomain<Integer> {
 
-public class UserDomain extends GenericDomain<Integer> {
-
+    private Integer id;
     private String name;
     private int age;
 
@@ -14,9 +13,19 @@ public class UserDomain extends GenericDomain<Integer> {
     }
 
     public UserDomain(Integer id, String name, int age) {
-        super(id);
+        this.id = id;
         this.name = name;
         this.age = age;
+    }
+
+    @Override
+    public Integer getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -41,20 +50,19 @@ public class UserDomain extends GenericDomain<Integer> {
             return true;
         if (!(o instanceof UserDomain that))
             return false;
-        if (!super.equals(o))
-            return false;
-        return age == that.age && Objects.equals(name, that.name);
+        return age == that.age && Objects.equals(id, that.id) && Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), name, age);
+        return Objects.hash(id, name, age);
     }
 
     @Override
     public String toString() {
         return "UserDomain {" +
-                "name='" + name + '\'' +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
                 ", age=" + age +
                 '}';
     }
