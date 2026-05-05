@@ -1,57 +1,54 @@
 package com.myproject;
 
-import java.time.Duration;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
 
-    private final static Queue<Integer> numbers = new LinkedBlockingQueue<>(250_000);
+    private static AtomicInteger number = new AtomicInteger(0);
 
-    private static void inc(int number) {
-        numbers.add(number);
-    }
-
-    private static void show() {
-        System.out.println(numbers);
-    }
-
-    // Transformei em static para o main acessar
     static Runnable inc = () -> {
-        for (int i = 0; i < 100; i++) {
-            inc(i);
+        for (int i = 0; i < 1_000_000; i++) {
+            number.incrementAndGet();
         }
+        System.out.println("Thread INC finalizada!");
     };
 
     static Runnable dec = () -> {
-        for (int i = 0; i > -100; i--) {
-            inc(i);
+        for (int i = 0; i < 1_000_000; i++) {
+            number.decrementAndGet();
         }
+        System.out.println("Thread DEC finalizada!");
     };
 
     static Runnable show = () -> {
-        for (int i = 0; i < 100; i++) {
-            show();
+        // Mostra o progresso a cada 100ms enquanto as outras threads
+        // estiverem vivas (opcional) ou por um tempo
+        for (int i = 0; i < 10; i++) {
+            try {
+                System.out.println("Valor atual monitorado: " + number.get());
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     };
 
     public static void main(String[] args) throws InterruptedException {
 
-        var execInc = new Thread(inc);
-        execInc.start();
-        execInc.setName("execInc");
-        execInc.join(Duration.ofSeconds(8));
+        Thread t1 = new Thread(inc);
+        Thread t2 = new Thread(dec);
+        Thread t3 = new Thread(show);
 
-        var execDec = new Thread(dec);
-        execDec.start();
-        execDec.setName("execDec");
+        t1.start();
+        t2.start();
+        t3.start();
 
-        var execShow = new Thread(show);
-        execShow.start();
-        execShow.setName("execShow");
+        // Faz o programa principal esperar as threads de cálculo terminarem
+        t1.join();
+        t2.join();
 
-        System.out.println(execInc.getName());
-        System.out.println(execDec.getName());
-        System.out.println(execShow.getName());
+        System.out.println("---------------------------------");
+        System.out.println("RESULTADO FINAL (Esperado 0): " + number.get());
+        System.out.println("---------------------------------");
     }
 }
