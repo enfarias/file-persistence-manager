@@ -1,15 +1,15 @@
-# 📂 File Persistence Manager (Java NIO)
+# 📂 File Persistence Manager (Java NIO & NIO.2)
 
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
 
-Uma solução modular e eficiente em Java para gerenciamento e persistência de dados em arquivos de texto (`.csv`), utilizando a API **Java NIO (New I/O)** para manipulação de arquivos de forma otimizada.
+Uma solução modular e eficiente em Java para gerenciamento e persistência de dados em arquivos de texto (`.csv`), explorando tanto a API clássica **Java NIO (Channels & Buffers)** quanto a moderna **Java NIO.2 (`java.nio.file.Files`)**.
 
 ---
 
 ## 🚀 Funcionalidades
 
-O projeto define uma abstração para persistência de dados em arquivos (`FilePersistence`), permitindo operações completas de CRUD baseadas em strings/sentenças:
+O projeto define uma abstração robusta através da interface `FilePersistence`, permitindo operações completas de manipulação de dados baseadas em strings e sentenças:
 
 * **Escrita (`write`):** Adiciona novos registros ao arquivo de forma incremental.
 * **Remoção (`remove`):** Remove linhas ou registros com base em um termo de busca.
@@ -21,7 +21,7 @@ O projeto define uma abstração para persistência de dados em arquivos (`FileP
 
 ## 🛠️ Estrutura do Código
 
-O projeto está dividido em pacotes que separam a lógica de abstração da implementação prática:
+O projeto separa contratos, implementações de E/S e a classe de execução:
 
 ```text
 src/
@@ -30,11 +30,13 @@ src/
         ├── Main.java                        # Classe principal para execução e testes
         └── persistence/
             ├── FilePersistence.java         # Interface com as operações de contrato
-            └── NIOFilePersistence.java      # Implementação utilizando java.nio
+            ├── NIOFilePersistence.java      # Implementação utilizando Java NIO (Channels/Buffers)
+            └── NIO2FilePersistence.java     # Implementação utilizando Java NIO.2 (Files API)
 ```
+
 ### Exemplo de Estrutura de Dados (`user.csv`)
 
-Os dados são gerenciados e persistidos no formato delimitado por ponto e vírgula dentro do diretório `managedFiles/NIO/`:
+Os dados são estruturados no formato CSV (delimitados por ponto e vírgula):
 
 ```csv
 Antonio;antonio@antonio.com;22/04/1973;
@@ -48,22 +50,24 @@ Ana;ana@ana.com;18/10/1988;
 
 ## 💻 Demonstração de Uso
 
-A classe `Main` demonstra o ciclo de vida da manipulação do arquivo, executando operações sequenciais de inserção, busca, deleção e atualização:
+A classe `Main` demonstra o ciclo de vida da persistência, executando operações sequenciais de inserção, listagem, filtros e substituições:
 
 ```java
-// Instanciação da persistência apontando para o arquivo desejado
+// Instanciação da persistência (ex: utilizando NIOFilePersistence)
 FilePersistence persistence = new NIOFilePersistence("user.csv");
 
-// Inserção de dados
+// Inserção de registros
 persistence.write("Edson;edson@edson.com;26/08/1973;");
+persistence.write("Maria;maria@edsomaria.com;12/01/1986;");
 
-// Busca por fragmentos de texto
-persistence.findBy("rge@");
+// Leitura completa de todos os registros
+System.out.println(persistence.findAll());
 
-// Remoção baseada em sentença
+// Buscas específicas por fragmentos
+System.out.println(persistence.findBy("@luca"));
+
+// Remoção e Substituição de dados
 persistence.remove(";maria");
-
-// Atualização de conteúdo existente
 persistence.replace("26/08/", "Antonio;antonio@antonio.com;22/04/1973;");
 ```
 
@@ -81,20 +85,20 @@ Para rodar este projeto localmente, você precisará de:
 1. Clone o repositório:
    
    ```bash
-   git clone [https://github.com/enfarias/get-started.git](https://github.com/enfarias/get-started.git)
+   git clone [https://github.com/enfarias/file-persistence-manager.git](https://github.com/enfarias/file-persistence-manager.git)
    ```
    
-3. Navegue até o diretório do projeto e compile as classes:
+2. Navegue até o diretório do projeto e compile as classes:
    
    ```bash
    javac com/myproject/Main.java com/myproject/persistence/*.java
    ```
    
-5. Execute o programa:
+3. Execute o programa:
    
-```bash
-java com.myproject.Main
-```
+   ```bash
+   java com.myproject.Main
+   ```
 
 ---
 
